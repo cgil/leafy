@@ -206,6 +206,7 @@
         ["START", "S T AA R T"],
         ["STOP", "S T AA P"],
         ["UP", "AH P"],
+        ["UP(2)", "AH1 P"],
         ["DOWN", "D AW N"],
         ["MUSIC", "M Y UW Z IH K"]
       ];
@@ -220,9 +221,11 @@
         {
           numStates: 3, start: 0, end: 2,
           transitions: [
-            {from: 0, to: 1, word: "LEAFY"}, {from: 1, to: 2, word: "MUSIC"}, 
-              {from: 2, to: 0, word: "UP"}, {from: 2, to: 0, word: "DOWN"}, {from: 2, to: 0, word: "START"},
-              {from: 2, to: 0, word: "STOP"}
+          {from: 0, to: 1, word: "LEAFY"}, {from: 0, to: 1, word: "UP"}, {from: 0, to: 1, word: "DOWN"},
+          {from: 0, to: 1, word: "START"}, {from: 0, to: 1, word: "STOP"}
+            // {from: 0, to: 1, word: "LEAFY"}, {from: 1, to: 2, word: "MUSIC"}, 
+            //   {from: 2, to: 0, word: "UP"}, {from: 2, to: 0, word: "DOWN"}, {from: 2, to: 0, word: "START"},
+            //   {from: 2, to: 0, word: "STOP"}
 
           ]
         };
