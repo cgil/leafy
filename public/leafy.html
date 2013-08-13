@@ -2,12 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>PocketSphinx.js</title>
+    <title>leafy</title>
   </head>
   <body>
-    <h2>PocketSphinx.js live demo</h2>
+    <h2>leafy</h2>
     <ul>
-      <li>This demo works on Chrome with the Web Audio API, make sure it works for you and actually records audio (audio recording on Chrome does not work well on all configs).</li>
+      <li>TMake sure this is running in a Chrome browser version 29+</li>
       <li>Press "Start" and speak</li>
     </ul>
     <select id="grammars"></select>
@@ -148,7 +148,7 @@
       window.onload = function init() {
         updateStatus("Initializing Web Audio and speech recognizer, waiting for approval to access your microphone");
         callbackManager = new CallbackManager();
-        spawnWorker("js/recognizer.js", function(worker) {
+        spawnWorker("javascripts/pocketsphinx/recognizer.js", function(worker) {
             // This is the onmessage function, once the worker is fully loaded
             worker.onmessage = function(e) {
                 // This is the case when we have a callback id to be called
@@ -210,7 +210,7 @@
     </script>
     <!-- These are the two JavaScript files you must load in the HTML,
     The recognizer is loaded through a Web Worker -->
-    <script src="js/audioRecorder.js"></script>
-    <script src="js/callbackManager.js"></script>
+    <script src="javascripts/pocketsphinx/audioRecorder.js"></script>
+    <script src="javascripts/pocketsphinx/callbackManager.js"></script>
   </body>
 </html>
