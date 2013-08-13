@@ -206,7 +206,8 @@
         ["START", "S T AA R T"],
         ["STOP", "S T AA P"],
         ["UP", "AH P"],
-        ["DOWN", "D AW N"]
+        ["DOWN", "D AW N"],
+        ["MUSIC", "M Y UW Z IH K"]
       ];
       // This grammar recognizes digits
       var grammarDigits = {numStates: 1, start: 0, end: 0, transitions: [{from: 0, to: 0, word: "ONE"},{from: 0, to: 0, word: "TWO"},{from: 0, to: 0, word: "THREE"},{from: 0, to: 0, word: "FOUR"},{from: 0, to: 0, word: "FIVE"},{from: 0, to: 0, word: "SIX"},{from: 0, to: 0, word: "SEVEN"},{from: 0, to: 0, word: "EIGHT"},{from: 0, to: 0, word: "NINE"},{from: 0, to: 0, word: "ZERO"}]};
@@ -217,9 +218,11 @@
 
       var grammarLeafy = 
         {
-          numStates: 1, start: 0, end: 0,
+          numStates: 3, start: 0, end: 2,
           transitions: [
-            {from: 0, to: 0, word: "LEAFY"}
+            {from: 0, to: 1, word: "LEAFY"}, {from: 1, to: 2, word: "MUSIC"}, 
+              {from: 2, to: 0, word: "UP"}, {from: 2, to: 0, word: "DOWN"}, {from: 2, to: 0, word: "START"},
+              {from: 2, to: 0, word: "STOP"}
 
           ]
         };
