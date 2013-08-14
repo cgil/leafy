@@ -4,5 +4,5 @@
  */
 
 exports.index = function(req, res){
-	res.sendfile('/leafy.html', {'root': 'public/'});
+	res.sendfile('/index.html', {'root': 'public/'});
 };
