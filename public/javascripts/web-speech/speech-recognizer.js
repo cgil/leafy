@@ -2,8 +2,6 @@
     "use strict";
     $(document).ready(function() {
 
-
-
         /*
          *******
          *****************
@@ -53,9 +51,9 @@
 
 
         //  Finite State Grammars
-        var grammars = [{w: "LEAFY", to: [
-            {w: "MUSIC", to: [{w: "UP", to: [{trans: true, type: "number"}]}, {w: "DOWN"}]},
-            {w: "LOG", to: [{w: "ADD"}, {w: "DELETE"}]}
+        var grammars = [{w: "TREEHOUSE", to: [
+            {w: "MUSIC", to: [{w: "UP", to: [{type: "number"}]}, {w: "DOWN", to: [{type: "number"}]}]},
+            {w: "LOG", to: [{w: "ADD", to: [{type: "string", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]}
         ]}];
 
         var curGrammars = grammars;
@@ -68,26 +66,65 @@
             for(var i = 0; i < grammars.length; i++) {
                 var node = grammars[i];
                 if(elemSet(node, "w", word)) {
-                    if(!elemSet(node, "to") || elemSet(node, "to", null)) { //  This is the last node
-                        return -1;
-                    }
-                    return node["to"];   //  Advance to next node
+                    return getNode(node);
                 }
                 else if(!elemSet(node, "w") || elemSet(node, "trans", true)) {  //  Transiest state
                     var type = "string";            //  Default type
+                    var length = 1;                 //  Default transient state length = 1 (word)
+                    var currentLength = 0;          //  Current length into transient state
                     if(elemSet(node, "type")) {     //  Get new type to search for
                         type = node["type"];
                     }
                     if(type === getType(word)) {    //  Make sure transient type is matched
-                        if(!elemSet(node, "to") || elemSet(node, "to", null)) { //  This is the last node
-                            return -1;
+                        if(elemSet(node, "end")) {  //  An end transient state word is specified
+                            if(node["end"] === word) {
+                                if(elemSet(node, "curLength")) {    //  Get current length if set
+                                    currentLength = node["curLength"];
+                                }
+                                currentLength++;
+                                node["curLength"] = currentLength;
+                                return getNode(node);
+                            }
                         }
-                        return node["to"];   //  Advance to next node
+                        if(elemSet(node, "length")) {   //  Transiest state length (iterations of successes)
+                            length = node["length"];
+                            if(elemSet(node, "curLength")) {    //  Get current length if set
+                                currentLength = node["curLength"];
+                            }
+                            if(currentLength < length) {    //  Transient state continues
+                                currentLength++;
+                                node["curLength"] = currentLength;
+                                if(currentLength === length) {
+                                    return getNode(node);
+                                }
+                                return grammars;
+                            }
+
+                        }
+                        currentLength++;
+                        node["curLength"] = currentLength;
+                        return getNode(node);
                     }
                     return 0; 
                 }
             }
             return 0;   //  No match found
+        };
+
+        var getNode = function(node) {
+            if(!elemSet(node, "to") || elemSet(node, "to", null)) { //  This is the last node
+                return -1;
+            }
+            return node["to"];   //  Advance to next node
+        };
+
+        //  If the word is reserved or special, perform some action
+        //  @return continuation statements: null- do nothing, continue loop, break from loop, etc..
+        var magicCommand = function(word) {
+            if(word === "TREEHOUSE") {      //  Reset
+                curGrammars = grammars;
+                return null;
+            }
         };
 
         var recognition = null;
@@ -125,23 +162,39 @@
             interimResult = '';
             textArea.setCursorPosition(pos);
             for (var i = event.resultIndex; i < event.results.length; ++i) {
-                var word = event.results[i][0].transcript;
+                var words = event.results[i][0].transcript;
+
                 if (event.results[i].isFinal) {
-                    insertAtCaret(textAreaID, word);
-                    node = findNextNode(curGrammars, word);
-                    if(node === 0) {       //  No matches
-                        continue;
+                    insertAtCaret(textAreaID, words);
+                    words = words.split(" ");
+                    for (var j = 0; j < words.length; j++) {
+                        var word = words[j];   
+
+                        word = word.toUpperCase().trim();
+                        var magicOption = magicCommand(word);   //  If the word is special or reserved, do the special things
+                        if(magicOption === "continue") {
+                            continue;
+                        }
+                        else if(magicOption === "break") {
+                            break;
+                        }
+
+                        node = findNextNode(curGrammars, word); //  Find the next node
+                        console.dir(node);
+                        if(node === 0) {       //  No matches found
+                            continue;
+                        }
+                        else if(node === -1) { //  Finished command
+                            curGrammars = grammars;
+                        }
+                        else {                  //  Found the next node
+                            curGrammars = node;
+                        } 
                     }
-                    else if(node === -1) { //  Finished command
-                        curGrammars = grammars;
-                    }
-                    else {                  //  Found the next node
-                        curGrammars = node;
-                    }
-                } 
+                }
                 else {
-                    insertAtCaret(textAreaID, word + '\u200B');
-                    interimResult += word + '\u200B';
+                    insertAtCaret(textAreaID, words + '\u200B');
+                    interimResult += words + '\u200B';
                 }
             }
         };
