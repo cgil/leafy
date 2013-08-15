@@ -84,7 +84,7 @@
             for(var i = 0; i < grammars.length; i++) {
                 var node = grammars[i];
                 if(elemSet(node, "w", word)) {
-                    return getNode(node);
+                    return getNextNode(node);
                 }
                 else if(!elemSet(node, "w") || elemSet(node, "trans", true)) {  //  Transiest state
                     var type = "string";            //  Default type
@@ -101,7 +101,7 @@
                                 }
                                 currentLength++;
                                 node["curLength"] = currentLength;
-                                return getNode(node);
+                                return getNextNode(node);
                             }
                         }
                         if(elemSet(node, "length")) {   //  Transiest state length (iterations of successes)
@@ -113,7 +113,7 @@
                                 currentLength++;
                                 node["curLength"] = currentLength;
                                 if(currentLength === length) {
-                                    return getNode(node);
+                                    return getNextNode(node);
                                 }
                                 return grammars;
                             }
@@ -121,7 +121,7 @@
                         }
                         currentLength++;
                         node["curLength"] = currentLength;
-                        return getNode(node);
+                        return getNextNode(node);
                     }
                     return 0; 
                 }
@@ -129,7 +129,8 @@
             return 0;   //  No match found
         };
 
-        var getNode = function(node) {
+        // Returns the next node
+        var getNextNode = function(node) {
             if(!elemSet(node, "to") || elemSet(node, "to", null)) { //  This is the last node
                 return -1;
             }
@@ -184,7 +185,7 @@
 
                 if (event.results[i].isFinal) {
                     insertAtCaret(textAreaID, words);
-                    words = words.trim().split(" ");
+                    words = words.trim().split(" ");    //  Transcript can come in as phrases, need to split it
                     for (var j = 0; j < words.length; j++) {
                         var word = words[j];   
 
