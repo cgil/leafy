@@ -65,13 +65,13 @@
          *  w: word to match against (if no word specified we assume its a transient state)
          *  to: an array for the next node (if no to property is specified OR to === null, we assume it's the end of the command)
          *  trans: if true, we are in a transient state where we listen for any input
-         *  type: for type checking (string, int, percent, ect..), can narrow down transient state input, defaults to string
+         *  type: for type checking (*, string, int, percent, ect..), can narrow down transient state input, defaults to string
          *  length: length of transient state (i.e length = 3 means we're in the transient state for 3 successful word captures), defaults to 1
          *  curLength: current length of transient state (current number of succesful word captures), defaults to 0
          */
         var grammars = [{w: "TREEHOUSE", to: [
             {w: "MUSIC", to: [{w: "UP", to: [{type: "number"}]}, {w: "DOWN", to: [{type: "number"}]}]},
-            {w: "LOG", to: [{w: "ADD", to: [{type: "string", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]}
+            {w: "LOG", to: [{w: "ADD", to: [{type: "*", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]}
         ]}];
 
         var curGrammars = grammars;
@@ -93,7 +93,7 @@
                     if(elemSet(node, "type")) {     //  Get new type to search for
                         type = node["type"];
                     }
-                    if(type === getType(word)) {    //  Make sure transient type is matched
+                    if(type === "*" || type === getType(word)) {    //  Make sure transient type is matched
                         if(elemSet(node, "end")) {  //  An end transient state word is specified
                             if(node["end"] === word) {
                                 if(elemSet(node, "curLength")) {    //  Get current length if set
@@ -184,7 +184,7 @@
 
                 if (event.results[i].isFinal) {
                     insertAtCaret(textAreaID, words);
-                    words = words.split(" ");
+                    words = words.trim().split(" ");
                     for (var j = 0; j < words.length; j++) {
                         var word = words[j];   
 
