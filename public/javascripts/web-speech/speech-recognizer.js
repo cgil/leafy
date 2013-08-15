@@ -50,7 +50,25 @@
          */
 
 
-        //  Finite State Grammars
+        /*  Finite State Grammars
+         *  This is used to specify commands and the formats the commands take.
+         *  For example: 
+         *  [{w: "TREEHOUSE", to: [
+         *   {w: "LOG", to: [{w: "ADD", to: [{type: "string", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]}
+         *  ]}];
+         *  Forms the commands:
+         *      TREEHOUSE -> LOG -> ADD -> stringx3
+         *      TREEHOUSE -> LOG -> DELETE -> stringx1
+         *
+         *  A node = [{ w: word, to: [next nodes], options: options]
+         *  Each node is an array which has options for the current node which can include:
+         *  w: word to match against (if no word specified we assume its a transient state)
+         *  to: an array for the next node (if no to property is specified OR to === null, we assume it's the end of the command)
+         *  trans: if true, we are in a transient state where we listen for any input
+         *  type: for type checking (string, int, percent, ect..), can narrow down transient state input, defaults to string
+         *  length: length of transient state (i.e length = 3 means we're in the transient state for 3 successful word captures), defaults to 1
+         *  curLength: current length of transient state (current number of succesful word captures), defaults to 0
+         */
         var grammars = [{w: "TREEHOUSE", to: [
             {w: "MUSIC", to: [{w: "UP", to: [{type: "number"}]}, {w: "DOWN", to: [{type: "number"}]}]},
             {w: "LOG", to: [{w: "ADD", to: [{type: "string", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]}
