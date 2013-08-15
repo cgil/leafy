@@ -1,24 +1,27 @@
 (function($) {
-
+    "use strict";
     $(document).ready(function() {
 
+        var recognition = null;
         try {
-            var recognition = new webkitSpeechRecognition();
+            recognition = new webkitSpeechRecognition();
         } catch(e) {
-            var recognition = Object;
+            recognition = Object;
         }
         recognition.continuous = true;
         recognition.interimResults = true;
+        recognition.requiredConfidence = 0.8;
+                    console.dir(recognition);
 
         var interimResult = '';
         var textArea = $('#speech-page-content');
         var textAreaID = 'speech-page-content';
 
-        $('.speech-mic').click(function(){
+        $(document).on('click', '.speech-mic', function(){
             startRecognition();
         });
 
-        $('.speech-mic-works').click(function(){
+        $(document).on('click', '.speech-mic-works', function(){
             recognition.stop();
         });
 
@@ -36,8 +39,8 @@
             for (var i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
                     insertAtCaret(textAreaID, event.results[i][0].transcript);
-                } else {
-                    isFinished = false;
+                } 
+                else {
                     insertAtCaret(textAreaID, event.results[i][0].transcript + '\u200B');
                     interimResult += event.results[i][0].transcript + '\u200B';
                 }
@@ -48,4 +51,4 @@
             $('.speech-content-mic').removeClass('speech-mic-works').addClass('speech-mic');
         };
     });
-})(jQuery);
+})(window.jQuery);
