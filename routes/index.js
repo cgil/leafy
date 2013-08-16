@@ -1,4 +1,4 @@
-
+(function() {
 /*
  * GET home page.
  */
@@ -19,5 +19,9 @@ exports.apps = function(req, res){
 	if(typeof callback !== 'undefined') {
 		response = callback + '(' + response + ');'; 
 	}  
+
+	var test = require('./apps/points.js');
 	res.send(response);
 };
+
+})();
