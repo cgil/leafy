@@ -8,6 +8,8 @@
          ****************************** Helpers ********************************
          */
 
+        var commandNodes = [];
+
         //  Check if an element exists in an object
         var elemSet = function(obj, prop, val) {
             if(obj.hasOwnProperty(prop)) {
@@ -88,7 +90,7 @@
                 if(elemSet(node, "w", word)) {
                     return getNextNode(node);
                 }
-                else if(!elemSet(node, "w") || elemSet(node, "trans", true)) {  //  Transiest state
+                else if(!elemSet(node, "w") || elemSet(node, "trans", true)) {  //  Transient state
                     var type = "string";            //  Default type
                     var length = 1;                 //  Default transient state length = 1 (word)
                     var currentLength = 0;          //  Current length into transient state
@@ -108,18 +110,26 @@
                         }
                         if(elemSet(node, "length")) {   //  Transiest state length (iterations of successes)
                             length = node["length"];
-                            if(elemSet(node, "curLength")) {    //  Get current length if set
-                                currentLength = node["curLength"];
-                            }
-                            if(currentLength < length) {    //  Transient state continues
-                                currentLength++;
-                                node["curLength"] = currentLength;
-                                if(currentLength === length) {
-                                    return getNextNode(node);
-                                }
-                                return grammars;
-                            }
+                        }
+                        if(elemSet(node, "curLength")) {    //  Get current length if set
+                            currentLength = node["curLength"];
+                        }
 
+                        if(currentLength < length) {    //  Transient state continues
+                            currentLength++;
+                            node["curLength"] = currentLength;
+
+                            var data = [];                 //  Data contains a list of words added while in the transient state
+                            if(elemSet(node, "data")) {    //  Get current data array if set
+                                data = node["data"];
+                            }
+                            data.push(word);
+                            node['data'] = data;
+
+                            if(currentLength === length) {  //  Length met, finished transient state
+                                return getNextNode(node);
+                            }
+                            return getNextNode(grammars, false);
                         }
                         currentLength++;
                         node["curLength"] = currentLength;
@@ -131,8 +141,13 @@
             return 0;   //  No match found
         };
 
-        // Returns the next node
-        var getNextNode = function(node) {
+        // Returns the next node or current node if next is set to false
+        var getNextNode = function(node, next) {
+            if(typeof next !== 'undefined' && next === false) {
+                return node;
+            }
+            commandNodes.push(node);    //  Store the current node into list of command nodes
+
             if(!elemSet(node, "to") || elemSet(node, "to", null)) { //  This is the last node
                 return -1;
             }
@@ -146,6 +161,10 @@
                 curGrammars = grammars;
                 return null;
             }
+        };
+
+        var sendCommad = function() {
+            window.console.dir(commandNodes);
         };
 
         /****************** SPEECH RECOGNITION *********************/
@@ -203,11 +222,12 @@
                         }
 
                         node = findNextNode(curGrammars, word); //  Find the next node
-                        console.dir(node);
                         if(node === 0) {       //  No matches found
                             continue;
                         }
                         else if(node === -1) { //  Finished command
+                            sendCommad();   //  Transmit the finished command
+                            commandNodes = [];          //  Reset the command nodes
                             curGrammars = grammars;
                         }
                         else {                  //  Found the next node

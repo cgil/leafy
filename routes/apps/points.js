@@ -1,9 +1,14 @@
-var PI = 3.14;
+var jquery = require('jquery');
+exports.init = function() {
+	var defer = jquery.Deferred();
 
-exports.area = function (r) {
-  return PI * r * r;
-};
+	var response = {};
 
-exports.circumference = function (r) {
-  return 2 * PI * r;
+	// Set object as a promise
+	defer.promise( response );
+
+	// Resolve the deferred
+	defer.resolve( "inside" );
+
+    return defer;
 };
