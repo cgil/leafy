@@ -50,6 +50,8 @@
          */
 
 
+         /****************** GRAMMARS AND NODE TRAVERSAL *********************/
+
         /*  Finite State Grammars
          *  This is used to specify commands and the formats the commands take.
          *  For example: 
@@ -74,7 +76,7 @@
             {w: "LOG", to: [{w: "ADD", to: [{type: "*", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]}
         ]}];
 
-        var curGrammars = grammars;
+        var curGrammars = grammars; //  Current grammars node
 
         /** Finds the command in a grammars array and returns the new array of grammars
          *  Traverse to next 'node', where a node is the next array of possible grammars
@@ -145,6 +147,8 @@
                 return null;
             }
         };
+
+        /****************** SPEECH RECOGNITION *********************/
 
         var recognition = null;
         try {
@@ -223,3 +227,4 @@
         };
     });
 })(window.jQuery);
+
