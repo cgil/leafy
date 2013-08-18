@@ -88,7 +88,7 @@
         var grammars = [{w: "TREEHOUSE", to: [
             {w: "MUSIC", duty: "command", hook: "music", to: [{w: "UP", to: [{type: "number"}]}, {w: "DOWN", to: [{type: "number"}]}]},
             {w: "LOG", duty: "command", hook: "log", to: [{w: "ADD", to: [{type: "*", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]},
-            {w: "GIVE", to: [{type: "string", hook: "name", to: [{type: "number", hook: "amount", to: [{w: "POINTS", duty: "command", hook: "music"}]}]}]}
+            {w: "GIVE", to: [{type: "string", hook: "name", to: [{type: "number", hook: "amount", to: [{w: "POINTS", duty: "command", hook: "points"}]}]}]}
         ]}];
 
         var curGrammars = grammars; //  Current grammars node
