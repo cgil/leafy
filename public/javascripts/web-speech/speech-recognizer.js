@@ -2,6 +2,12 @@
     "use strict";
     $(document).ready(function() {
 
+        /*******************************GLOBALS**********************************/
+        var SERVER_URL = "http://54.221.205.192";
+        var APPS_URL = SERVER_URL + "/apps";
+
+        /**********************************************************************/
+
         /*
          *******
          *****************
@@ -58,7 +64,7 @@
          *  This is used to specify commands and the formats the commands take.
          *  For example: 
          *  [{w: "TREEHOUSE", to: [
-         *   {w: "LOG", to: [{w: "ADD", to: [{type: "string", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]}
+         *   {w: "LOG", duty: "command", hook: "log", to: [{w: "ADD", to: [{type: "string", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]}
          *  ]}];
          *  Forms the commands:
          *      TREEHOUSE -> LOG -> ADD -> stringx3
@@ -72,10 +78,16 @@
          *  type: for type checking (*, string, int, percent, ect..), can narrow down transient state input, defaults to string
          *  length: length of transient state (i.e length = 3 means we're in the transient state for 3 successful word captures), defaults to 1
          *  curLength: current length of transient state (current number of succesful word captures), defaults to 0
+         *  data: an array to store captured words while in a transient state
+         *  hook: a name given to the node that can be used as an identfier later
+         *  duty: the special purpose that the state provides- such as containing the app name to be used:
+         *      implemented-
+         *          command, if command is specified the hook must also be specified and must be the name
+         *                  if the app to be called. {duty: "command", hook: "log"} calls the log.js app.
          */
         var grammars = [{w: "TREEHOUSE", to: [
-            {w: "MUSIC", to: [{w: "UP", to: [{type: "number"}]}, {w: "DOWN", to: [{type: "number"}]}]},
-            {w: "LOG", to: [{w: "ADD", to: [{type: "*", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]}
+            {w: "MUSIC", duty: "command", hook: "music", to: [{w: "UP", to: [{type: "number"}]}, {w: "DOWN", to: [{type: "number"}]}]},
+            {w: "LOG", duty: "command", hook: "points", to: [{w: "ADD", to: [{type: "*", length: 3, end: "STOP"}]}, {w: "DELETE", to: [{type: "string"}]}]}
         ]}];
 
         var curGrammars = grammars; //  Current grammars node
@@ -91,6 +103,7 @@
                     return getNextNode(node);
                 }
                 else if(!elemSet(node, "w") || elemSet(node, "trans", true)) {  //  Transient state
+                    node["trans"] = true;
                     var type = "string";            //  Default type
                     var length = 1;                 //  Default transient state length = 1 (word)
                     var currentLength = 0;          //  Current length into transient state
@@ -164,8 +177,43 @@
         };
 
         var sendCommad = function() {
-            window.console.dir(commandNodes);
+            var args = [];
+            var command = null;
+            for (var i = 0; i < commandNodes.length; i++) {
+                var node = commandNodes[i];
+                if(elemSet(node, "duty")) {     //  Special duty node, collect information for request
+                    if(node["duty"] === "command" && elemSet(node, "hook") && isset(node["hook"])) {
+                        command = node["hook"];
+                    }
+                }
+                if(elemSet(node, "trans")) {    //  Transient state collect the args stored
+                    var arg = {};
+                    if(elemSet(node, "hook")) {
+                        arg.hook = node["hook"];
+                    }
+                    arg.data = node["data"];
+                    arg.length = node["data"].length;
+                    args.push(arg);
+                }   
+            }
+            
+            if(isset(command)) {
+                var url = APPS_URL + "/" + command;
+                url += "?callback=?";
+                var data = "args="+JSON.stringify(args);
+
+                $.ajax({
+                    dataType: 'jsonp',
+                    data: data,                      
+                    jsonp: 'callback',
+                    url: url,                       
+                    success: function(data) {
+                        window.console.log(data);
+                    }
+                });
+            }
         };
+
 
         /****************** SPEECH RECOGNITION *********************/
 

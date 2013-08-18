@@ -11,9 +11,9 @@ exports.apps = function(req, res){
 	var appRequest = req.params.appName;
 
 	var callback = req.query.callback;
-	var args = req.query.args;
-
-	res.header('Content-Type', 'text/html');
+	var args = req.query.args || [];
+	
+	res.header('Content-type','application/json');
 	res.header('Charset', 'utf-8');
 
 	var appFound = false;
@@ -22,11 +22,15 @@ exports.apps = function(req, res){
 		for (var i = 0; i < apps.length; i++) {
 			if(apps[i] === appRequest) {
 				var app = require('./apps/'+ apps[i] +'.js');
-				app.init(args).then(function(data) {
+				app.init(JSON.parse(args)).then(function(data) {
+					// res.send(req.query.callback + '('+ JSON.stringify(data) + ');');
 					var response = '{"app": "'+ appRequest +'", "args": "'+ args +'", "success": "true", "response":"'+ data +'"}';
 					if(typeof callback !== 'undefined') {
-						response = callback + '(' + response + ');'; 
+						response = callback + '(' + JSON.stringify(response) + ');'; 
 					}  
+					else {
+						response = JSON.stringify(response);
+					}
 					res.send(response);
 				});
 				appFound = true;

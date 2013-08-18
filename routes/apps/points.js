@@ -1,5 +1,5 @@
 var jquery = require('jquery');
-exports.init = function() {
+exports.init = function(args) {
 	var defer = jquery.Deferred();
 
 	var response = {};
@@ -8,7 +8,7 @@ exports.init = function() {
 	defer.promise( response );
 
 	// Resolve the deferred
-	defer.resolve( "inside" );
+	defer.resolve( JSON.stringify(args[0]));
 
     return defer;
 };
