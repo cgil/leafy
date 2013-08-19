@@ -57,6 +57,12 @@
          *******
          */
 
+        var resetGrammars = function() {
+            var grammarsCopy = $.extend(true, [], grammars);
+            return grammarsCopy;
+        };
+
+
 
          /****************** GRAMMARS AND NODE TRAVERSAL *********************/
 
@@ -91,7 +97,7 @@
             {w: "GIVE", to: [{type: "string", hook: "name", to: [{type: "number", hook: "amount", to: [{w: "POINTS", duty: "command", hook: "points"}]}]}]}
         ]}];
 
-        var curGrammars = grammars; //  Current grammars node
+        var curGrammars = resetGrammars(); //  Current grammars node
 
         /** Finds the command in a grammars array and returns the new array of grammars
          *  Traverse to next 'node', where a node is the next array of possible grammars
@@ -172,7 +178,7 @@
         //  @return continuation statements: null- do nothing, continue loop, break from loop, etc..
         var magicCommand = function(word) {
             if(word === "TREEHOUSE") {      //  Reset
-                curGrammars = grammars;
+                curGrammars = resetGrammars();
                 return null;
             }
         };
@@ -277,7 +283,7 @@
                         else if(node === -1) { //  Finished command
                             sendCommad();   //  Transmit the finished command
                             commandNodes = [];          //  Reset the command nodes
-                            curGrammars = grammars;
+                            curGrammars = resetGrammars();
                         }
                         else {                  //  Found the next node
                             curGrammars = node;
