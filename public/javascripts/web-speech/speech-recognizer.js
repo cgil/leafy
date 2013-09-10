@@ -221,6 +221,36 @@
             }
         };
 
+    exports.handleWords = function(words) {
+            words = words.trim().split(",");
+            for (var j = 0; j < words.length; j++) {
+                var word = words[j];   
+
+                word = word.toUpperCase().trim();
+                var magicOption = magicCommand(word);   //  If the word is special or reserved, do the special things
+                if(magicOption === "continue") {
+                    continue;
+                }
+                else if(magicOption === "break") {
+                    break;
+                }
+
+                node = findNextNode(curGrammars, word); //  Find the next node
+                if(node === 0) {       //  No matches found
+                    continue;
+                }
+                else if(node === -1) { //  Finished command
+                    sendCommad();   //  Transmit the finished command
+                    commandNodes = [];          //  Reset the command nodes
+                    curGrammars = resetGrammars();
+                }
+                else {                  //  Found the next node
+                    curGrammars = node;
+                } 
+            }
+        };
+    }
+
 
         /****************** SPEECH RECOGNITION *********************/
 
