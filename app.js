@@ -30,6 +30,7 @@ app.get('/', routes.index);
 
 app.enable("jsonp callback");
 app.get('/apps/:appName', routes.apps);
+app.get('/speech', routes.speech);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server -leafy- listening on port ' + app.get('port'));
